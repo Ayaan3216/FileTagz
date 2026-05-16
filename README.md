@@ -19,9 +19,28 @@ Built with an **Electron** frontend and robust **Windows Shell integration**, Fi
 - 💫 **Premium Interface**: A sleek, fully responsive, glassmorphic tag manager UI.
 - 🗄️ **Local Database**: Fast, lightweight tracking of tagged files using a normalized JSON database.
 
-## 🚀 Getting Started
+## 📥 Download & Install
 
-### Prerequisites
+You don't need to be a developer to use FileTagz! You can simply download and run the installer.
+
+### Minimum Requirements
+- **OS:** Windows 10 or Windows 11 (64-bit)
+- **Permissions:** Administrator privileges (for the initial context menu setup and Vault UAC features)
+- **Storage:** ~100MB of free space
+
+### Installation Steps
+1. Navigate to the **[Releases](https://github.com/Ayaan3216/FileTagz/releases)** page on GitHub.
+2. Under the latest release, click to download the `FileTagz Setup <version>.exe` file.
+3. Double-click the downloaded `.exe` to run the installer.
+4. Once installed, FileTagz will be available on your machine, and the color-tagging option will immediately become active in your native Windows Right-Click Context Menu!
+
+---
+
+## 💻 Developer Setup
+
+If you want to view the code, build from source, or contribute to FileTagz, follow the steps below.
+
+### Prerequisites (For Developers)
 - Windows 10 or 11
 - [Node.js](https://nodejs.org/) (v16+)
 - Git
