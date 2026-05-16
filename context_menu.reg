@@ -1,0 +1,22 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\Classes\*\shell\FileTagz]
+@="Tag with FileTagz"
+"Icon"="C:\\Users\\vardh\\.gemini\\antigravity\\scratch\\FileTagz\\src\\icon.png"
+
+[HKEY_CURRENT_USER\Software\Classes\*\shell\FileTagz\command]
+@="wscript.exe \"C:\\Users\\vardh\\.gemini\\antigravity\\scratch\\FileTagz\\launcher.vbs\" \"%1\""
+
+[HKEY_CURRENT_USER\Software\Classes\Directory\shell\FileTagz]
+@="Tag with FileTagz"
+"Icon"="C:\\Users\\vardh\\.gemini\\antigravity\\scratch\\FileTagz\\src\\icon.png"
+
+[HKEY_CURRENT_USER\Software\Classes\Directory\shell\FileTagz\command]
+@="wscript.exe \"C:\\Users\\vardh\\.gemini\\antigravity\\scratch\\FileTagz\\launcher.vbs\" \"%1\""
+
+[HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\FileTagz]
+@="Tag with FileTagz"
+"Icon"="C:\\Users\\vardh\\.gemini\\antigravity\\scratch\\FileTagz\\src\\icon.png"
+
+[HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\FileTagz\command]
+@="wscript.exe \"C:\\Users\\vardh\\.gemini\\antigravity\\scratch\\FileTagz\\launcher.vbs\" \"%V\""

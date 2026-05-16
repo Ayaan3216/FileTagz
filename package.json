@@ -1,0 +1,55 @@
+{
+  "name": "filetagz",
+  "version": "1.0.0",
+  "description": "Premium color file-tagging utility for Windows",
+  "main": "main.js",
+  "author": {
+    "name": "Ayaan4uThere",
+    "email": "schoolboy3216@gmail.com"
+  },
+  "license": "MIT",
+  "scripts": {
+    "start":     "electron .",
+    "dev":       "electron . --dev",
+    "build":     "electron-builder --win appx",
+    "build:exe": "electron-builder --win nsis",
+    "build:all": "electron-builder --win appx nsis"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.ayaan4uthere.filetagz",
+    "productName": "FileTagz",
+    "copyright": "Copyright © 2025 Ayaan4uThere",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "node_modules/**/*",
+      "!node_modules/electron-builder/**/*",
+      "!node_modules/.cache/**/*"
+    ],
+    "win": {
+      "icon": "build/icons/icon_256x256.png",
+      "target": [
+        { "target": "appx", "arch": ["x64"] }
+      ]
+    },
+    "appx": {
+      "applicationId":       "FileTagz",
+      "backgroundColor":     "#0D0D11",
+      "displayName":         "FileTagz",
+      "identityName":        "Ayaan4uThere.FileTagz",
+      "publisher":           "CN=31FE4E0D-E95D-48DB-BF4E-2388FD7C3EBC",
+      "publisherDisplayName": "Ayaan4uThere",
+      "languages":           ["en-US"],
+      "setBuildNumber":      false
+    }
+  }
+}
