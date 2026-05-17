@@ -1,6 +1,6 @@
 {
   "name": "filetagz",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Premium color file-tagging utility for Windows",
   "main": "main.js",
   "author": {
@@ -38,8 +38,15 @@
     "win": {
       "icon": "build/icons/icon_256x256.png",
       "target": [
-        { "target": "appx", "arch": ["x64"] }
+        { "target": "nsis", "arch": ["x64"] }
       ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "artifactName": "FileTagz${version}.exe",
+      "include": "build/installer.nsh"
     },
     "appx": {
       "applicationId":       "FileTagz",

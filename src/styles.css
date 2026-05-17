@@ -98,6 +98,42 @@ body.theme-oled {
   --accent-glow: rgba(255, 255, 255, 0.2);
 }
 
+body.theme-hacker {
+  --bg-base: #0a0a0a;
+  --bg-surface: #0d110d;
+  --bg-elevated: #111a11;
+  --bg-hover: #162416;
+  --bg-active: #1a301a;
+  --glass-bg: rgba(13, 17, 13, 0.8);
+  --glass-border: rgba(0, 255, 0, 0.15);
+  --text-primary: #00ff00;
+  --text-secondary: #00cc00;
+  --text-tertiary: rgba(0, 204, 0, 0.5);
+  --accent: #00ff00;
+  --accent-hover: #33ff33;
+  --accent-glow: rgba(0, 255, 0, 0.3);
+  --border: rgba(0, 255, 0, 0.2);
+  --border-strong: rgba(0, 255, 0, 0.4);
+}
+
+body.theme-rosepine {
+  --bg-base: #191724;
+  --bg-surface: #1f1d2e;
+  --bg-elevated: #26233a;
+  --bg-hover: #312f4b;
+  --bg-active: #393655;
+  --glass-bg: rgba(31, 29, 46, 0.7);
+  --text-primary: #e0def4;
+  --text-secondary: #908caa;
+  --text-tertiary: rgba(144, 140, 170, 0.6);
+  --accent: #ebbcba;
+  --accent-hover: #f6c177;
+  --accent-glow: rgba(235, 188, 186, 0.3);
+  --danger: #eb6f92;
+  --border: rgba(224, 222, 244, 0.08);
+  --border-strong: rgba(224, 222, 244, 0.15);
+}
+
 html, body {
   height: 100%;
   overflow: hidden;
@@ -107,6 +143,11 @@ html, body {
   background: transparent;
   -webkit-font-smoothing: antialiased;
   user-select: none;
+}
+
+input, textarea, [contenteditable] {
+  user-select: auto;
+  -webkit-user-select: auto;
 }
 
 body {

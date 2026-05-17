@@ -14,6 +14,18 @@ const VAULT_TAG = { id: VAULT_TAG_ID, name: 'Hidden', color: '#9D4EDD', icon: '\
 let vaultUnlocked = false;       // true only after correct password in this session
 let vaultPendingFiles = [];      // files queued to hide while setup modal is open
 
+// Settings & Audio
+let appSettings = {};
+let clickAudio = null;
+
+function playClickSound() {
+    if (appSettings.clickSound && clickAudio) {
+        clickAudio.currentTime = 0;
+        clickAudio.play().catch(() => {});
+    }
+}
+
+
 // DOM Elements
 const tagNav = document.getElementById('tag-nav');
 const countAll = document.getElementById('count-all');
@@ -77,10 +89,15 @@ async function init() {
         fileTags = await window.filetagz.getFileTags();
         
         const settings = await window.filetagz.getSettings();
-        if (settings && settings.theme) {
-            applyTheme(settings.theme);
-            themeSelect.value = settings.theme;
+        if (settings) {
+            appSettings = settings;
+            if (settings.theme) {
+                applyTheme(settings.theme);
+                themeSelect.value = settings.theme;
+            }
+            await initAudio();
         }
+
         
         // Load file info for all tagged files (excluding vault files still accessible)
         await refreshFilesInfo();
@@ -264,6 +281,8 @@ async function renderFileGrid() {
         if (visibleFiles.length === 0) {
             emptyState.style.display = 'flex';
             viewSubtitle.textContent = 'No files found';
+            document.querySelector('#empty-state h3').textContent = 'No tagged files yet';
+            document.querySelector('#empty-state p').innerHTML = 'Click <strong>Add File</strong> or <strong>Add Folder</strong> to start tagging';
         } else {
             emptyState.style.display = 'none';
             viewSubtitle.textContent = `${visibleFiles.length} file${visibleFiles.length !== 1 ? 's' : ''}`;
@@ -311,6 +330,8 @@ async function loadAndRenderFolderView() {
     if (visibleEntries.length === 0) {
         emptyState.style.display = 'flex';
         viewSubtitle.textContent = 'Empty folder';
+        document.querySelector('#empty-state h3').textContent = 'Folder is empty';
+        document.querySelector('#empty-state p').innerHTML = 'There are no items matching your criteria in this folder.';
     } else {
         emptyState.style.display = 'none';
         viewSubtitle.textContent = `${visibleEntries.length} item${visibleEntries.length !== 1 ? 's' : ''}`;
@@ -406,7 +427,6 @@ function createCard(filePath, info, parentGrid) {
             currentFolderPath = filePath;
             renderSidebar();
             renderFileGrid();
-            loadAndRenderFolderView();
         } else {
             window.filetagz.openPath(filePath);
         }
@@ -420,8 +440,13 @@ function createCard(filePath, info, parentGrid) {
         card.classList.add('selected');
         renderDetailPanel(filePath);
         
+        // Remove existing menu if present
+        const existingMenu = document.getElementById('custom-context-menu');
+        if (existingMenu) document.body.removeChild(existingMenu);
+        
         // Custom simple right-click menu
         const menu = document.createElement('div');
+        menu.id = 'custom-context-menu';
         menu.style.position = 'fixed';
         menu.style.top = `${e.clientY}px`;
         menu.style.left = `${e.clientX}px`;
@@ -444,11 +469,14 @@ function createCard(filePath, info, parentGrid) {
             item.style.borderRadius = '4px';
             item.onmouseover = () => item.style.background = 'var(--accent)';
             item.onmouseout = () => item.style.background = 'transparent';
-            item.onclick = () => { onClick(); document.body.removeChild(menu); };
+            item.onclick = () => { onClick(); if (document.body.contains(menu)) document.body.removeChild(menu); };
             return item;
         };
         
         menu.appendChild(createItem('Open', () => window.filetagz.openPath(filePath)));
+        if (!info.isDirectory) {
+            menu.appendChild(createItem('Open With...', () => window.filetagz.openWith(filePath)));
+        }
         menu.appendChild(createItem('Show in Explorer', () => window.filetagz.openInExplorer(filePath)));
         menu.appendChild(createItem('Manage Tags', () => openTagModal([filePath])));
         
@@ -484,8 +512,18 @@ function createCard(filePath, info, parentGrid) {
         
         document.body.appendChild(menu);
         
-        const closeMenu = () => { if(document.body.contains(menu)) document.body.removeChild(menu); document.removeEventListener('click', closeMenu); };
-        document.addEventListener('click', closeMenu);
+        const closeMenu = (ev) => { 
+            if(document.body.contains(menu) && ev.target.closest('#custom-context-menu') !== menu) {
+                document.body.removeChild(menu); 
+                document.removeEventListener('click', closeMenu); 
+                document.removeEventListener('contextmenu', closeMenu);
+            }
+        };
+        // Use timeout so this current click/contextmenu doesn't immediately close it
+        setTimeout(() => {
+            document.addEventListener('click', closeMenu);
+            document.addEventListener('contextmenu', closeMenu);
+        }, 10);
     };
     
     // Select file
@@ -678,7 +716,6 @@ function setupEventListeners() {
             currentFolderPath = folderHistory.pop();
             renderSidebar();
             renderFileGrid();
-            loadAndRenderFolderView();
         } else {
             currentFolderPath = null;
             folderHistory = [];
@@ -700,7 +737,6 @@ function setupEventListeners() {
             currentFolderPath = selectedFilePath;
             renderSidebar();
             renderFileGrid();
-            loadAndRenderFolderView();
         }
     };
 
@@ -963,6 +999,8 @@ function renderVaultGrid() {
 
     if (vaultFiles.length === 0) {
         emptyState.style.display = 'flex';
+        document.querySelector('#empty-state h3').textContent = 'Vault is empty';
+        document.querySelector('#empty-state p').innerHTML = 'Right-click any file and select <strong>Manage Tags</strong> -> <strong>Hidden</strong> to secure it here.';
     } else {
         emptyState.style.display = 'none';
         const fragment = document.createDocumentFragment();
@@ -975,9 +1013,17 @@ function renderVaultGrid() {
 
 function setupVaultEventListeners() {
     // ─ Vault sidebar button
-    document.getElementById('vault-nav-btn').onclick = () => {
+    document.getElementById('vault-nav-btn').onclick = async () => {
         currentFolderPath = null;
         folderHistory = [];
+        const hasPwd = await window.filetagz.vaultHasPassword();
+        
+        if (!hasPwd) {
+            // Force setup if they try to access the vault without a password
+            openVaultSetupModal();
+            return;
+        }
+        
         if (vaultUnlocked) {
             currentFilter = VAULT_TAG_ID;
             renderSidebar();
@@ -992,7 +1038,6 @@ function setupVaultEventListeners() {
         }
     };
 
-    // ─ Setup modal — submit
     document.getElementById('vault-setup-submit').onclick = async () => {
         const pwd  = document.getElementById('vault-setup-pwd').value;
         const conf = document.getElementById('vault-setup-confirm').value;
@@ -1002,9 +1047,14 @@ function setupVaultEventListeners() {
         err.textContent = '';
         await window.filetagz.vaultSetPassword(pwd);
         document.getElementById('vault-setup-modal').classList.add('hidden');
-        await hideFilesInVault(vaultPendingFiles);
-        vaultPendingFiles = [];
+        if (vaultPendingFiles && vaultPendingFiles.length > 0) {
+            await hideFilesInVault(vaultPendingFiles);
+            vaultPendingFiles = [];
+        }
+        vaultUnlocked = true;
+        currentFilter = VAULT_TAG_ID;
         refreshAfterTagChange();
+        renderVaultGrid();
     };
     document.getElementById('vault-setup-cancel').onclick = () => {
         vaultPendingFiles = [];
@@ -1071,4 +1121,71 @@ function setupAboutListeners() {
         window.filetagz.openExternal('mailto:schoolboy3216@gmail.com');
 }
 
+// ─── Audio ───────────────────────────────────────────────────────────────────
+async function initAudio() {
+    // We create an audio element dynamically.
+    if (!clickAudio) {
+        clickAudio = new Audio();
+        // Prevent long sounds from overlapping annoyingly or playing too long
+        // The user asked for it to be very short (0.1s max). We will handle that on playback.
+        clickAudio.addEventListener('timeupdate', () => {
+            if (clickAudio.currentTime > 0.1) {
+                clickAudio.pause();
+                clickAudio.currentTime = 0;
+            }
+        });
+    }
+
+    if (appSettings.customSoundPath) {
+        const dataUrl = await window.filetagz.getSoundDataURL(appSettings.customSoundPath);
+        if (dataUrl) {
+            clickAudio.src = dataUrl;
+        } else {
+            clickAudio.src = 'click.mp3';
+        }
+    } else {
+        clickAudio.src = 'click.mp3';
+    }
+    
+    // Bind settings toggles
+    const soundToggle = document.getElementById('toggle-sound');
+    if (soundToggle) {
+        soundToggle.checked = !!appSettings.clickSound;
+        soundToggle.onchange = async (e) => {
+            appSettings.clickSound = e.target.checked;
+            await window.filetagz.setSettings({ clickSound: appSettings.clickSound });
+        };
+    }
+    
+    const pickSoundBtn = document.getElementById('btn-pick-sound');
+    if (pickSoundBtn) {
+        pickSoundBtn.onclick = async () => {
+            const filePath = await window.filetagz.pickSoundFile();
+            if (filePath) {
+                appSettings.customSoundPath = filePath;
+                await window.filetagz.setSettings({ customSoundPath: filePath });
+                await initAudio(); // reload audio
+            }
+        };
+    }
+    
+    // Global click handler for tactile feel on any interactive element
+    document.addEventListener('mousedown', (e) => {
+        // Play sound if clicking a button, link, or interactive card
+        const target = e.target;
+        const isInteractive = target.closest('button') || 
+                              target.closest('a') || 
+                              target.closest('.file-card') || 
+                              target.closest('.tag-nav-item') ||
+                              target.closest('.modal-tag-option') ||
+                              target.closest('.detail-tag-chip') ||
+                              target.closest('input') ||
+                              target.closest('select');
+        if (isInteractive) {
+            playClickSound();
+        }
+    });
+}
+
 init();
+

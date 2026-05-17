@@ -19,6 +19,29 @@ Built with an **Electron** frontend and robust **Windows Shell integration**, Fi
 - 💫 **Premium Interface**: A sleek, fully responsive, glassmorphic tag manager UI.
 - 🗄️ **Local Database**: Fast, lightweight tracking of tagged files using a normalized JSON database.
 
+## 🚀 What's New in v1.0.2 (May 17, 2026)
+
+### 🌟 Features & Enhancements
+- **Native Windows Context Menu Drop-Down:** Completely rewrote the Windows Explorer integration. Right-clicking a file in Windows now displays the FileTagz logo alongside a cascading drop-down menu containing all your custom tags.
+- **Dynamic Registry Syncing:** The Windows context menu now automatically rebuilds and syncs itself in the background whenever you create, rename, or delete a tag inside the app.
+- **Silent External Tagging:** Tagging a file via the Windows right-click menu now applies the tag silently in the background and instantly live-reloads the UI if the application is currently open.
+- **Tactile UI Sounds:** Introduced a premium 0.1-second tactile click sound that plays on all interactive UI elements. Custom audio `.mp3`/`.wav` upload support was added in settings!
+- **New Themes:** Added two highly requested aesthetic themes: **Hacker (Matrix)** and **Rose Pine**.
+- **Branded Tray Icon:** Replaced the default taskbar icon with a custom Blue-to-Purple gradient icon matching the premium FileTagz branding.
+- **"Open With..." Support:** Added a functional `Open With...` button inside the app's right-click menu that invokes the native Windows application chooser.
+- **Smart Self-Cleaning Installer:** The installer performs a clean, one-click upgrade and automatically deletes its own setup file from the desktop once finished.
+
+### ⚡ Performance Optimizations
+- **Ultra-Lightweight Architecture:** Disabled Chromium hardware acceleration, site isolation, and redundant background threads. This drastically reduces the application's memory footprint and eliminates unnecessary sub-processes in the Task Manager.
+- **Single Instance Lock:** Enforced a single-instance lock to prevent the app from spawning duplicate background processes.
+
+### 🐛 Bug Fixes
+- **Context Menu Duplication:** Fixed a UI bug where repeatedly right-clicking a file inside the app would stack and duplicate the custom context menu.
+- **Ghost Folders Fixed:** Implemented strict physical existence checks when scanning directories. The app will no longer display deleted or non-existent "ghost" folders in the file grid.
+- **Vault Desync & Password Hang Fix:** The Vault securely reads the password hash directly from disk to fix caching bugs. Also replaced the unreliable PowerShell UAC script with a secure native confirmation dialog.
+
+---
+
 ## 📥 Download & Install
 
 You don't need to be a developer to use FileTagz! You can simply download and run the installer.

@@ -210,11 +210,25 @@
           <option value="midnight">Midnight Blue</option>
           <option value="dracula">Dracula</option>
           <option value="oled">OLED Black</option>
+          <option value="hacker">Hacker (Matrix)</option>
+          <option value="rosepine">Rose Pine</option>
         </select>
       </div>
       <p style="margin-top: 4px;">Manage application appearance and tags.</p>
       
       <div id="settings-tag-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px;"></div>
+      
+      <h4 style="margin-bottom: 8px;">General Settings</h4>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding: 12px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;">
+        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; cursor: pointer;">
+          <span>Tactile UI Click Sounds</span>
+          <input type="checkbox" id="toggle-sound" style="accent-color: var(--accent);">
+        </label>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 11px; color: var(--text-tertiary);">Custom Sound:</span>
+            <button id="btn-pick-sound" style="background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Browse...</button>
+        </div>
+      </div>
       
       <h4 style="margin-bottom: 8px;">Create New Tag</h4>
       <div style="display: flex; gap: 8px; margin-bottom: 20px;">
